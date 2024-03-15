@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Clustering</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.min.js" integrity="sha384-9N8qg+tV4/4JxF34VTT1PQ+8SHe48i0tSvl5U21Aa3b+F5tbx7q1Ygb0Tb+XfYPd" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5+EHJv5m9bc4Ur5snjS46j2+xr2pizmgJy2v5+Ix" crossorigin="anonymous"></script>
+    <style>
+        table {
+            font-family: Arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Real-Time Clustering</h1>
+    <h2>Data Customer</h2>
+    <div id="customer-data">
+        <table>
+            <thead>
+                <tr>
+                    <th>Customer_ID</th>
+                    <th>Nama Pelanggan</th>
+                    <th>Jenis Kelamin</th>
+                    <th>Umur</th>
+                    <th>Profesi</th>
+                    <th>Tipe Residen</th>
+                    <th>NilaiBelanjaSetahun</th>
+                    <th>Clusters</th>
+                    <th>Segmen</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for index, row in clustering_result.iterrows() %}
+                    <tr>
+                        <td>{{ row['Customer_ID'] }}</td>
+                        <td>{{ row['Nama Pelanggan'] }}</td>
+                        <td>{{ row['Jenis Kelamin'] }}</td>
+                        <td>{{ row['Umur'] }}</td>
+                        <td>{{ row['Profesi'] }}</td>
+                        <td>{{ row['Tipe Residen'] }}</td>
+                        <td>{{ row['NilaiBelanjaSetahun'] }}</td>
+                        <td>{{ row['clusters'] }}</td>
+                        <td>{{ row['segmen'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Tambahkan Data Customer Baru</h2>
+    <form id="add-customer-form" method="POST" action="/add_customer">
+        <label for="nama_pelanggan">Nama Pelanggan:</label><br>
+        <input type="text" id="nama_pelanggan" name="nama_pelanggan" required><br>
+        <label for="jenis_kelamin">Jenis Kelamin:</label><br>
+        <select id="jenis_kelamin" name="jenis_kelamin" required>
+            <option value="Pria">Pria</option>
+            <option value="Wanita">Wanita</option>
+        </select><br>
+        <label for="umur">Umur:</label><br>
+        <input type="number" id="umur" name="umur" required><br>
+        <label for="profesi">Profesi:</label><br>
+        <input type="text" id="profesi" name="profesi" required><br>
+        <label for="tipe_residen">Tipe Residen:</label><br>
+        <select id="tipe_residen" name="tipe_residen" required>
+            <option value="Cluster">Cluster</option>
+            <option value="Sector">Sector</option>
+        </select><br>
+        <label for="nilai_belanja">Nilai Belanja Setahun:</label><br>
+        <input type="number" id="nilai_belanja" name="nilai_belanja" required><br><br>
+        <input type="submit" value="Tambahkan">
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            // Membuat koneksi SocketIO ke server
+            var socket = io();
+    
+            // Mendengarkan event 'update_clusters' dari server
+            socket.on('update_clusters', function(clustering_result) {
+                // Memperbarui data pelanggan dalam tabel
+                var rows = '';
+                $.each(clustering_result, function(index, row) {
+                    rows += '<tr>' +
+                                '<td>' + row['Customer_ID'] + '</td>' +
+                                '<td>' + row['Nama Pelanggan'] + '</td>' +
+                                '<td>' + row['Jenis Kelamin'] + '</td>' +
+                                '<td>' + row['Umur'] + '</td>' +
+                                '<td>' + row['Profesi'] + '</td>' +
+                                '<td>' + row['Tipe Residen'] + '</td>' +
+                                '<td>' + row['NilaiBelanjaSetahun'] + '</td>' +
+                                '<td>' + row['clusters'] + '</td>' +
+                                '<td>' + row['segmen'] + '</td>' +
+                            '</tr>';
+                });
+                // Mengganti isi tbody dengan baris-baris data yang baru
+                $('#customer-data tbody').html(rows);
+            });
+        });
+    </script>
+
+    <!-- <script>
+        $(document).ready(function() {
+            // Membuat koneksi SocketIO ke server
+            var socket = io();
+            
+
+            // Mendengarkan event 'update_clusters' dari server
+            // socket.on('update_clusters', function(clustering_result) {
+            //     // Memperbarui tampilan data customer dengan hasil clustering terbaru
+            //     $('#customer-data').html(clustering_result);
+            // });
+        });
+    </script> -->
+</body>
+</html>

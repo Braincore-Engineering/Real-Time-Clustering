@@ -1,0 +1,7 @@
+flask
+pandas
+mlxtend
+flask_socketio
+numpy
+scikit-learn
+kmodes
